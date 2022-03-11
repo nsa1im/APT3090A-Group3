@@ -4,37 +4,44 @@
 
 using namespace std;
 
-int prime(int number){
+int checkprime(int number){ //c++ programming language
 	int m;
 	int flag=0;
-    m=number/2;
-    for(int i=2; i<=m; i++)
-    {
-    	if(number%i==0)
+    	m=number/2;
+    	for(int i=2; i<=m; i++)
+    	{
+    		if(number%i==0)
 		{
-        	flag=1;
-        	break;
-      	}
+        		flag=1;
+        		break;
+      		}
 	}
   	return flag;
 }
 
-int grnp(int range0, int range1){
+int p(int range0, int range1){ //c++ programming language
 	int p=rand();
-	int ispprime=prime(p);
+	int ispprime=checkprime(p);
 	while (p<range0 || p>range1 || ispprime==1){
 		p=rand();
-		ispprime=prime(p);
+		ispprime=checkprime(p);
 	}
 	return p;
 } 
 
-int grnq(int range0, int range1){
+int q(int range0, int range1){ //c++ programming language
 	int q=rand();
-	int isqprime=prime(q);
+	int isqprime=checkprime(q);
 	while (q<range0 || q>range1 || isqprime==1){
 		q=rand();
-		isqprime=prime(q);
+		isqprime=checkprime(q);
 	}
 	return q;
+}
+
+int findgcd(int a, int b) { //c++ programming language
+   	if (b == 0){
+   		return a;
+   	}
+   	return findgcd(b, a % b);
 }
