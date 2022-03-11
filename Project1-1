@@ -45,3 +45,19 @@ int findgcd(int a, int b) { //c++ programming language
    	}
    	return findgcd(b, a % b);
 }
+
+//generating n and phi(euler totient function)
+int n(int p, int q) //c++ programming language
+{
+n = p * q;
+return n;
+}
+    
+int getTotient(int p, int q) //c++ programming language
+{
+int phi = (p - 1) * (q - 1);
+return phi
+}
+
+
+
