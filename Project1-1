@@ -47,6 +47,7 @@ int findgcd(int a, int b) { //c++ programming language
 }
 
 //generating n and phi(euler totient function)
+
 int n(int p, int q) //c++ programming language
 {
 n = p * q;
@@ -59,5 +60,23 @@ int phi = (p - 1) * (q - 1);
 return phi
 }
 
+
+
+
+
+
+
+//java programming language
+public static void main(){  
+try{  
+ServerSocket s1=new ServerSocket(6666);  
+Socket s=s1.accept();                   //establishes connection   
+DataInputStream input=new DataInputStream(s.getInputStream());  
+String  x=(String)input.readUTF();  
+System.out.println("message= "+ x);  
+ss.close();  
+}catch(Exception e){System.out.println(e);}  
+}  
+} 
 
 
