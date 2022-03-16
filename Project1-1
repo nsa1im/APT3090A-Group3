@@ -60,9 +60,24 @@ int phi = (p - 1) * (q - 1);
 return phi;
 }
 
-
-
-
+//generate public key and private key in Java programming language
+private void keygenerate()
+{
+bitLength = 512;
+certainty = 50;
+rnd = new SecureRandom();
+p = new BigInteger(bitLength, certainty, rnd);
+q = new BigInteger(bitLength,certainty,rnd);
+n= p.multiply(q);
+one= new BigInteger("1");
+x = p.subtract(one).multiply(q.subtract(one));
+e = new BigInteger("65537");
+d = e.modInverse(x);
+publicKey=n.toString();
+publickyText.setText(publicKey);
+privateKey = d.toString();
+privatekyText.setText(privateKey);
+}
 
 
 
