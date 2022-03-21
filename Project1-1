@@ -90,8 +90,9 @@ DataInputStream input=new DataInputStream(s.getInputStream());
 String  x=(String)input.readUTF();  
 System.out.println("message= "+ x);  
 ss.close();  
-}catch(Exception e){System.out.println(e);}  
+}catch(Exception e){System.out.println(e);} 
 }  
 } 
+
 
 
