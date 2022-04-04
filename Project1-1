@@ -1,5 +1,5 @@
 //Alice.java: Code for Alice
-//This file generates the keys, decrypts cipher text and also encrypts messages
+//This file generates the keys, decrypts cipher text and also encrypts messages...the process repeats itself
 package rsa;
 import java.net.*;  
 import java.io.*; 
@@ -79,7 +79,7 @@ public class Alice{
 }  
 
 //Bob.java: Code for Bob
-//This code retrieves the keys from Alice.java and then encrypts the message and also decrypts the cipher text
+//This code retrieves the keys from Alice.java and then encrypts the message and also decrypts the cipher text...the process repeats itself
 package rsa;
 import java.net.*;  
 import java.io.*;  
