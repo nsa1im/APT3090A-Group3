@@ -1,98 +1,142 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+//Alice.java
+package rsa;
+import java.net.*;  
+import java.io.*; 
+import java.math.BigInteger;
+import java.util.Scanner;
+import java.lang.Object;
+import java.util.Random;
+import java.security.SecureRandom;
 
-using namespace std;
-
-int checkprime(int number){ //c++ programming language
-	int m;
-	int flag=0;
-    	m=number/2;
-    	for(int i=2; i<=m; i++)
-    	{
-    		if(number%i==0)
-		{
-        		flag=1;
-        		break;
-      		}
-	}
-  	return flag;
-}
-
-int p(int range0, int range1){ //c++ programming language
-	int p=rand();
-	int ispprime=checkprime(p);
-	while (p<range0 || p>range1 || ispprime==1){
-		p=rand();
-		ispprime=checkprime(p);
-	}
-	return p;
-} 
-
-int q(int range0, int range1){ //c++ programming language
-	int q=rand();
-	int isqprime=checkprime(q);
-	while (q<range0 || q>range1 || isqprime==1){
-		q=rand();
-		isqprime=checkprime(q);
-	}
-	return q;
-}
-
-int findgcd(int a, int b) { //c++ programming language
-   	if (b == 0){
-   		return a;
-   	}
-   	return findgcd(b, a % b);
-}
-
-//generating n and phi(euler totient function)
-
-int n(int p, int q) //c++ programming language
-{
-n = p * q;
-return n;
-}
-    
-int getTotient(int p, int q) //c++ programming language
-{
-int phi = (p - 1) * (q - 1);
-return phi;
-}
-
-//generate public key and private key in Java programming language
-private void keygenerate()
-{
-bitLength = 512;
-certainty = 50;
-rnd = new SecureRandom();
-p = new BigInteger(bitLength, certainty, rnd);
-q = new BigInteger(bitLength,certainty,rnd);
-n= p.multiply(q);
-one= new BigInteger("1");
-x = p.subtract(one).multiply(q.subtract(one));
-e = new BigInteger("65537");
-d = e.modInverse(x);
-publicKey=n.toString();
-publickyText.setText(publicKey);
-privateKey = d.toString();
-privatekyText.setText(privateKey);
-}
-
-
-
-//java programming language
-public static void main(){  
-try{  
-ServerSocket s1=new ServerSocket(6666);  
-Socket s=s1.accept();                   //establishes connection   
-DataInputStream input=new DataInputStream(s.getInputStream());  
-String  x=(String)input.readUTF();  
-System.out.println("message= "+ x);  
-ss.close();  
-}catch(Exception e){System.out.println(e);} 
+public class Alice{  
+    private String[] message=new String[10000];
+    private BigInteger[] message2=new BigInteger[10000];
+    private String[] generateValues()
+    {
+        int bitLength = 512;
+        int certainty = 50;
+        SecureRandom rndm = new SecureRandom();
+        BigInteger p = new BigInteger(bitLength, certainty, rndm);
+        BigInteger q = new BigInteger(bitLength, certainty,rndm);
+        BigInteger n= p.multiply(q);
+        BigInteger one= new BigInteger("1");
+        BigInteger etf = p.subtract(one).multiply(q.subtract(one));
+        BigInteger e;
+        do e = new BigInteger(etf.bitLength(), rndm);
+        while (e.compareTo(BigInteger.ONE) <= 0
+                || e.compareTo(etf) >= 0
+                || !e.gcd(etf).equals(BigInteger.ONE));
+        String[] values = {n.toString(), etf.toString(), e.toString()}; 
+        return values;
+    }
+    public static void main(String args[])throws Exception{  
+        Alice m1 = new Alice();
+        String[] m2 = m1.generateValues();
+        BigInteger n = new BigInteger(m2[0]);
+        BigInteger etf = new BigInteger(m2[1]);
+        BigInteger e = new BigInteger(m2[2]);
+        BigInteger d = e.modInverse(etf);
+        Socket s1 = new Socket("localhost",55555);  
+        DataInputStream din=new DataInputStream(s1.getInputStream());  
+        DataOutputStream dout=new DataOutputStream(s1.getOutputStream());
+        BufferedReader br1=new BufferedReader(new InputStreamReader(System.in));  
+        System.out.println("Connection established with Bob! Sending Bob the Public Key");
+        String str="",str2="";  
+        dout.writeUTF(e.toString()+", "+n.toString()+", "+etf.toString()); 
+        dout.flush();
+        while(!str.equals("END")){    
+            str2=din.readUTF();  
+            String[] aftersplit = str2.split("N");
+            String str2_after_ascii="";
+            for(int i=0; i<aftersplit.length; i++){
+                BigInteger bi = new BigInteger(aftersplit[i]);
+                char ch = (char) (bi.modPow(d, n)).intValue();
+                str2_after_ascii = str2_after_ascii+ch;
+            }
+            System.out.println("Encrypting message... "+str2);
+            System.out.println("Bob says: "+str2_after_ascii);  
+            System.out.println("Type in your message to send or type END to quit...");
+            str=br1.readLine();
+            for(int i=0; i<str.length(); i++){
+                char character = str.charAt(i);
+                int ascii = Character.hashCode(character);
+                m1.message[i] = String.valueOf(ascii);
+                m1.message2[i]=new BigInteger(m1.message[i]);
+                BigInteger ciphered = m1.message2[i].modPow(e, n);
+                m1.message2[i] = ciphered;
+            }
+            String combine="";
+            for(int k=0; k<str.length(); k++){
+                combine = combine+(m1.message2[k].toString())+"N"; 
+            }
+            dout.writeUTF(combine);
+            dout.flush();
+        }  
+        dout.close();  
+        s1.close();  
+    }
 }  
-} 
 
+//Bob.java
+package rsa;
+import java.net.*;  
+import java.io.*;  
+import java.math.BigInteger;
+import java.util.Scanner;
+import java.lang.Object;
+import java.util.Random;
+import java.security.SecureRandom;
 
-
+public class Bob{
+    private String[] message=new String[10000];
+    private BigInteger[] message2=new BigInteger[10000];
+    
+    public static void main(String args[])throws Exception{  
+        Bob msg1 = new Bob();
+        ServerSocket ss=new ServerSocket(55555);  
+        Socket s=ss.accept();  
+        DataInputStream din=new DataInputStream(s.getInputStream());  
+        DataOutputStream dout=new DataOutputStream(s.getOutputStream());  
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));  
+        System.out.println("Connection established with Alice!");
+        String str="",str2="";
+        str=din.readUTF();
+        System.out.println("Alice has sent the public key as: "+str);
+        String[] received = str.split(", ");
+        BigInteger e = new BigInteger(received[0]);
+        BigInteger n = new BigInteger(received[1]);
+        BigInteger d = e.modInverse(new BigInteger(received[2]));
+        while(!str2.equals("END")){  
+            System.out.println("Type in your message to send: ");
+            str2=br.readLine();
+            for(int i=0; i<str2.length(); i++){
+                char character = str2.charAt(i);
+                int ascii = Character.hashCode(character);
+                msg1.message[i] = String.valueOf(ascii);
+                msg1.message2[i]=new BigInteger(msg1.message[i]);
+                BigInteger ciphered = msg1.message2[i].modPow(e, n);
+                msg1.message2[i] = ciphered;
+            }
+            String combine="";
+            for(int k=0; k<str2.length(); k++){
+                combine = combine+(msg1.message2[k].toString())+"N"; 
+            }
+            dout.writeUTF(combine);
+            dout.flush();
+            str=din.readUTF();  
+            String[] aftersplit = str.split("N");
+            String str_after_ascii="";
+            for(int i=0; i<aftersplit.length; i++){
+                BigInteger bi = new BigInteger(aftersplit[i]);
+                char ch = (char) (bi.modPow(d, n)).intValue();
+                str_after_ascii = str_after_ascii+ch;
+            }
+            System.out.println("Encrypting message... "+str);
+            System.out.println("Alice says: "+str_after_ascii);  
+        } 
+        System.out.println("Coversation has ended! ");
+        din.close();  
+        s.close();  
+        ss.close();  
+    }
+}  
